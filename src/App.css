@@ -11,28 +11,12 @@ body {
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
-.circle {
-  width: 350px;
-  height: 350px;
-  background: linear-gradient(to top, #f2f3f4 0%, #3c9d43 100%);
-  border-radius: 100%;
+.container {
   position: relative;
-  padding: 40px;
-  box-sizing: border-box;
-  position: relative;
-  display: flex;
+  width: 400px;
+  height: 400px;
   justify-content: center;
-  align-items: center;
-  margin: auto;
-  margin-top: 1rem;
-}
-
-.rounded-cirlce-box {
-  height: 360px;
-  width: 360px;
-
-  background: linear-gradient(to bottom, #cfe8d7, #dbe6ec);
-  border-radius: 50%;
+  display: flex;
 }
 
 .wristWatch {
@@ -40,6 +24,7 @@ body {
   width: 100px;
   height: 180px;
   object-fit: contain;
+  top: 30%;
 }
 
 .wheelCenter {
@@ -47,6 +32,7 @@ body {
   height: 80px;
   z-index: 3;
   position: absolute;
+  top: 40%;
 }
 
 .title {
@@ -54,7 +40,7 @@ body {
   text-align: center;
   font-weight: 800;
   position: absolute;
-  top: 10%;
+  top: 15%;
 }
 
 .price {
@@ -63,7 +49,7 @@ body {
   font-weight: 800;
   padding: 6px 10px;
   position: absolute;
-  bottom: 10%;
+  bottom: 15%;
 }
 
 .deal {
@@ -94,7 +80,7 @@ body {
 }
 
 .deal-section {
-  margin-top: 3rem;
+  margin-top: 1rem;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -156,6 +142,11 @@ body {
   color: white;
   padding: 8px 10px;
   font-size: 13px;
+  cursor: pointer;
+}
+
+.chance-btns div:hover {
+  opacity: 80%;
 }
 
 .chance-box {
@@ -173,7 +164,6 @@ body {
   width: 95%;
   margin-top: 1rem;
   accent-color: #3c9d43;
-  background: red;
 }
 
 .price-footer {
