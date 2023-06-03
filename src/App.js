@@ -7,61 +7,56 @@ import { Icon } from "@iconify/react";
 import Wheel from "./wheel";
 
 function App() {
-  const [gradientStop, setGradientStop] = useState(50);
-  const [isRolling, setIsRolling] = useState(false);
+  const [gradientStop, setGradientStop] = useState(280);
   const minDuration = 4; // Minimum duration in seconds
   const maxDuration = 6; // Maximum duration in seconds
   const [rollingDuration, setRollingDuration] = useState(0);
+  const [isSpinning, setIsSpinning] = useState(false);
 
   const handleGradientChange = (event) => {
     setGradientStop(event.target.value); // Update gradient stop value
   };
 
-  const circleBeforeStyle = {
-    borderRadius: "100%",
-    content: '""',
-    backgroundImage: "linear-gradient(to bottom, #fff, #3c9d43)",
-    top: "-15px",
-    left: "-15px",
-    bottom: "-15px",
-    right: "-15px",
-    position: "absolute",
-    zIndex: "-1",
-  };
-
-  circleBeforeStyle.backgroundImage = `linear-gradient(to top, #3c9d43, #fff ${gradientStop}%)`;
-
   const handleRolling = () => {
+    setIsSpinning(true);
     // Generate a random duration within the range
     const duration = Math.random() * (maxDuration - minDuration) + minDuration;
-    setRollingDuration(duration); // Update rolling duration
-    setIsRolling(false); // Set rolling state to false to reset the needle position
+
     setTimeout(() => {
-      setIsRolling(true); // Set rolling state to true to start the rotation
-    }, 0); // Use a minimal delay to allow the state update to take effect
+      setIsSpinning(false); // Stop the spinning after the specified duration
+    }, duration * 1000);
+
+    setRollingDuration(duration); // Update rolling duration
   };
 
   const checkLandingPosition = () => {
     const needleAngle = (360 * rollingDuration) % 360; // Calculate the current angle of the needle
     if (needleAngle <= 280) {
-      alert("The needle landed on the green part!"); // Needle landed on the green part
+      setIsSpinning(false);
+      setTimeout(() => {
+        alert("The needle landed on the green part!"); // Needle landed on the green part
+      }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
     } else {
-      alert("The needle landed on the white part!"); // Needle landed on the white part
+      setIsSpinning(false);
+      setTimeout(() => {
+        alert("The needle landed on the white part!"); // Needle landed on the white part
+      }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
     }
   };
+  
 
   useEffect(() => {
-    if (isRolling && rollingDuration) {
+    if (isSpinning && rollingDuration) {
       setTimeout(() => {
-        setIsRolling(false); // Set the rolling state to false after the rolling duration has passed
+        setIsSpinning(false); // Set the rolling state to false after the rolling duration has passed
         checkLandingPosition(); // Check the landing position of the needle
       }, rollingDuration * 1000);
     }
-  }, [isRolling, rollingDuration]);
+  }, [isSpinning, rollingDuration,setIsSpinning]);
+
+  let newGradientStop = 0;
 
   const handleChanceClick = (chance) => {
-    let newGradientStop = 0;
-
     // Determine the new gradient stop value based on the chance
     if (chance === "Min") {
       newGradientStop = 0.0;
@@ -78,6 +73,23 @@ function App() {
     setGradientStop(newGradientStop); // Update gradient stop value
   };
 
+  const getNeedleStyle = () => {
+    const needleAngle = (360 * rollingDuration) % 360;
+    const transitionDuration = isSpinning ? `${rollingDuration}s linear` : "0s";
+
+    return {
+      bottom: "50%",
+      transformOrigin: "bottom",
+      transform: `rotate(${needleAngle}deg)`,
+      transformStyle: "preserve-3d",
+      filter: "drop-shadow(2px 4px 4px gray)",
+      pointerEvents: "none",
+      position: "absolute",
+      zIndex: 2,
+      transition: transitionDuration,
+    };
+  };
+
   return (
     <>
       <div className="wrapper">
@@ -88,18 +100,9 @@ function App() {
             <div className="price">$1,192,590.00</div>
             <img
               src={needle}
-              style={{
-                bottom: "50%",
-                transformOrigin: "bottom",
-                transform: `rotate(${360 * rollingDuration}deg)`,
-                transformStyle: "preserve-3d",
-                filter: "drop-shadow(2px 4px 4px gray)",
-                pointerEvents: "none",
-                position: "absolute",
-                zIndex: 2,
-                transition: `${rollingDuration}s linear`,
-              }}
+              style={getNeedleStyle()}
               alt="needle"
+              className={isSpinning ? "needle" : ""}
             />
 
             <img src={wheelCenter} alt="wheelCenter" className="wheelCenter" />
@@ -107,7 +110,7 @@ function App() {
           </div>
           <div>
             <div className="deal-section">
-              {isRolling ? (
+              {isSpinning ? (
                 <div className="rolling-text">Rolling</div>
               ) : (
                 <div className="deal">

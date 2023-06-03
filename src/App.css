@@ -174,3 +174,29 @@ body {
   font-size: 13px;
   margin-top: -15px;
 }
+
+.needle {
+  bottom: 50%;
+  transform-origin: bottom;
+  transform: rotate(0deg);
+  transform-style: preserve-3D;
+  filter: drop-shadow(2px 4px 4px gray);
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .needle {
+    animation: needle-spin infinite 0.3s linear;
+  }
+}
+
+@keyframes needle-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

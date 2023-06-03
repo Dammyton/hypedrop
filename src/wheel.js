@@ -8,9 +8,11 @@ const Wheel = ({ gradientStop }) => {
     const ctx = canvas.getContext("2d");
 
     // Set initial angle and wheel size
+    let angle = 0;
     const wheelRadius = 170;
     const wheelCenterX = canvas.width / 2;
     const wheelCenterY = canvas.height / 2;
+    const wheelColor = "#e5f2f9";
     const wheelInnerEdgeColor = "white";
     const wheelInnerEdgeWidth = 22;
     const wheelOuterEdgeColor = "#f2f3f4";
@@ -18,51 +20,14 @@ const Wheel = ({ gradientStop }) => {
     const smallWheelColor = "green";
     const smallWheelThickness = 16;
     let isDragging = false;
-    const offsetAngle = Math.PI / 2; // Offset angle to adjust the starting position
-    let angle = Math.PI + offsetAngle; // Initial position at 80% around the circle with offset
 
     const drawWheel = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Create a temporary canvas for applying gradients
-      const gradientCanvas = document.createElement("canvas");
-      const gradientCtx = gradientCanvas.getContext("2d");
-      gradientCanvas.width = canvas.width;
-      gradientCanvas.height = canvas.height;
-
-      // Define the radial gradient
-      const radialGradient = gradientCtx.createRadialGradient(
-        wheelCenterX,
-        wheelCenterY,
-        0,
-        wheelCenterX,
-        wheelCenterY,
-        wheelRadius
-      );
-      radialGradient.addColorStop(0, "rgba(217, 136, 255, 0.2)");
-      radialGradient.addColorStop(1, "rgba(217, 136, 255, 0)");
-
-      // Define the linear gradient
-      const linearGradient = gradientCtx.createLinearGradient(
-        0,
-        wheelCenterY - wheelRadius,
-        0,
-        wheelCenterY + wheelRadius
-      );
-      linearGradient.addColorStop(0, "#c5e2c7");
-      linearGradient.addColorStop(1, "#e5f2f9");
-
-      // Apply gradients to the temporary canvas
-      gradientCtx.fillStyle = radialGradient;
-      gradientCtx.fillRect(0, 0, gradientCanvas.width, gradientCanvas.height);
-      gradientCtx.fillStyle = linearGradient;
-      gradientCtx.fillRect(0, 0, gradientCanvas.width, gradientCanvas.height);
-
-      // Draw the main wheel using the gradient pattern
-      const pattern = ctx.createPattern(gradientCanvas, "no-repeat");
+      // Draw the main wheel
       ctx.beginPath();
       ctx.arc(wheelCenterX, wheelCenterY, wheelRadius, 0, 2 * Math.PI);
-      ctx.fillStyle = pattern;
+      ctx.fillStyle = wheelColor;
       ctx.fill();
 
       // Draw the inner edge of the wheel
@@ -75,20 +40,21 @@ const Wheel = ({ gradientStop }) => {
       ctx.strokeStyle = wheelOuterEdgeColor;
       ctx.stroke();
 
-      // Calculate the position of the green line based on the gradientStop value
-      const smallWheelStartAngle = -Math.PI / 2;
-      const smallWheelEndAngle = smallWheelStartAngle + angle;
-      const smallWheelX = wheelCenterX;
-      const smallWheelY = wheelCenterY;
+      // Calculate the position of the circular line
+      const lineRadius = wheelRadius + smallWheelThickness / 2 - 8; // Adjusted by 8 pixels
+      const lineStartAngle = angle - Math.PI / 2;
+      const lineEndAngle =
+        lineStartAngle + (gradientStop / 360) * (Math.PI * 2);
 
-      // Draw the small wheel
+      // Draw the circular line
       ctx.beginPath();
       ctx.arc(
-        smallWheelX,
-        smallWheelY,
-        wheelRadius,
-        smallWheelStartAngle,
-        smallWheelEndAngle
+        wheelCenterX,
+        wheelCenterY,
+        lineRadius,
+        lineStartAngle,
+        lineEndAngle,
+        false
       );
       ctx.lineWidth = smallWheelThickness;
       ctx.strokeStyle = smallWheelColor;
@@ -96,8 +62,28 @@ const Wheel = ({ gradientStop }) => {
       ctx.stroke();
 
       if (isDragging) {
+        // Update the angle based on the mouse position
+        const handleMouseMove = (event) => {
+          const rect = canvas.getBoundingClientRect();
+          const mouseX = event.clientX - rect.left;
+          const mouseY = event.clientY - rect.top;
+
+          const dx = mouseX - wheelCenterX;
+          const dy = mouseY - wheelCenterY;
+          angle = Math.atan2(dy, dx);
+        };
+
         // Attach the mousemove event listener
         document.addEventListener("mousemove", handleMouseMove);
+
+        // Clean up the event listener on mouse up or leave
+        const handleMouseUp = () => {
+          isDragging = false;
+          document.removeEventListener("mousemove", handleMouseMove);
+          document.removeEventListener("mouseup", handleMouseUp);
+          document.removeEventListener("mouseleave", handleMouseUp);
+        };
+
         document.addEventListener("mouseup", handleMouseUp);
         document.addEventListener("mouseleave", handleMouseUp);
       }
@@ -107,25 +93,6 @@ const Wheel = ({ gradientStop }) => {
     };
 
     drawWheel();
-
-    // Update the angle based on the mouse position
-    const handleMouseMove = (event) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = event.clientX - rect.left;
-      const mouseY = event.clientY - rect.top;
-
-      const dx = mouseX - wheelCenterX;
-      const dy = mouseY - wheelCenterY;
-      angle = Math.atan2(dy, dx);
-    };
-
-    // Clean up the event listener on mouse up or leave
-    const handleMouseUp = () => {
-      isDragging = false;
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("mouseleave", handleMouseUp);
-    };
 
     // Handle mouse events to initiate dragging
     const handleMouseDown = () => {
@@ -138,9 +105,6 @@ const Wheel = ({ gradientStop }) => {
     // Clean up event listener on component unmount
     return () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("mouseleave", handleMouseUp);
     };
   }, [gradientStop]);
 
@@ -150,7 +114,7 @@ const Wheel = ({ gradientStop }) => {
       width={380}
       height={380}
       style={{ touchAction: "none", cursor: "grab" }}
-    ></canvas>
+    />
   );
 };
 
