@@ -37,7 +37,7 @@ function App() {
     const needleAngle = (360 * rollingDuration) % 360; // Calculate the current angle of the needle
     const adjustedNeedleAngle = needleAngle + 90; // Adjust the needle angle to match the starting position
 
-    const rotationDelay = rollingDuration * 1000; // Delay the alert based on the rolling duration
+    const rotationDelay = rollingDuration;
 
     const rotationInterval = 10; // Time interval for updating the needle rotation
     const totalRotations = Math.ceil(rotationDelay / rotationInterval); // Total rotations based on the rotation delay
