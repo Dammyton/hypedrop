@@ -30,18 +30,48 @@ function App() {
   };
 
   const checkLandingPosition = () => {
-    const needleAngle = (360 * rollingDuration) % 360; // Calculate the current angle of the needle
+    const greenStop = gradientStop; // Use the current gradient stop value
+
     setIsSpinning(false);
 
-    if (needleAngle <= gradientStop) {
-      setTimeout(() => {
-        alert("The needle landed on the green part!"); // Needle landed on the green part
-      }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
-    } else {
-      setTimeout(() => {
-        alert("The needle landed on the white part!"); // Needle landed on the white part
-      }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
-    }
+    const needleAngle = (360 * rollingDuration) % 360; // Calculate the current angle of the needle
+    const adjustedNeedleAngle = needleAngle + 90; // Adjust the needle angle to match the starting position
+
+    const rotationDelay = rollingDuration * 1000; // Delay the alert based on the rolling duration
+
+    const rotationInterval = 10; // Time interval for updating the needle rotation
+    const totalRotations = Math.ceil(rotationDelay / rotationInterval); // Total rotations based on the rotation delay
+
+    let rotationCount = 0; // Counter for the current rotation
+
+    const rotateNeedle = setInterval(() => {
+      const rotationStep = adjustedNeedleAngle / totalRotations; // Calculate the rotation step for each interval
+
+      const currentRotation = rotationStep * rotationCount; // Calculate the current rotation angle
+
+      const currentAngle = (currentRotation % 360) - 90; // Calculate the current angle of the needle
+
+      document.getElementById(
+        "needle"
+      ).style.transform = `rotate(${currentAngle}deg)`; // Update the needle rotation
+
+      rotationCount++; // Increment the rotation counter
+
+      if (rotationCount >= totalRotations) {
+        clearInterval(rotateNeedle); // Stop the needle rotation
+
+        // Check if the needle landed on the green or white part
+        if (needleAngle <= greenStop) {
+          setTimeout(() => {
+            alert("The needle landed on the green part!"); // Needle landed on the green part
+          }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
+        } else {
+          setTimeout(() => {
+            alert("The needle landed on the white part!"); // Needle landed on the white part
+          }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
+        }
+      }
+    }, rotationInterval);
   };
 
   useEffect(() => {
@@ -98,6 +128,7 @@ function App() {
             <h4 className="title">Royal Oak Tourbillon</h4>
             <div className="price">$1,192,590.00</div>
             <img
+              id="needle"
               src={needle}
               style={getNeedleStyle()}
               alt="needle"
