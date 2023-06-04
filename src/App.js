@@ -31,19 +31,18 @@ function App() {
 
   const checkLandingPosition = () => {
     const needleAngle = (360 * rollingDuration) % 360; // Calculate the current angle of the needle
-    if (needleAngle <= 280) {
-      setIsSpinning(false);
+    setIsSpinning(false);
+
+    if (needleAngle <= gradientStop) {
       setTimeout(() => {
         alert("The needle landed on the green part!"); // Needle landed on the green part
       }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
     } else {
-      setIsSpinning(false);
       setTimeout(() => {
         alert("The needle landed on the white part!"); // Needle landed on the white part
       }, 500); // Delay the alert for 500 milliseconds to allow the needle to stop spinning
     }
   };
-  
 
   useEffect(() => {
     if (isSpinning && rollingDuration) {
@@ -52,7 +51,7 @@ function App() {
         checkLandingPosition(); // Check the landing position of the needle
       }, rollingDuration * 1000);
     }
-  }, [isSpinning, rollingDuration,setIsSpinning]);
+  }, [isSpinning, rollingDuration, setIsSpinning]);
 
   let newGradientStop = 0;
 
